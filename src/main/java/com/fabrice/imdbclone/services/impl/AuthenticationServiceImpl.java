@@ -37,7 +37,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
       return userRepository.save(user);
     }
 
-    public SignupResponse signin(SigninRequest signinRequest){
+    public SignInResponse signin(SigninRequest signinRequest){
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signinRequest.getEmail(),signinRequest.getPassword()));
         var user  = userRepository.findByEmail(signinRequest.getEmail())
                 .orElseThrow(() -> new BadRequestException("Invalid email or password"));
@@ -50,13 +50,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 
         //response with user details
-        SignupResponse signupResponse = new SignupResponse();
+        SignInResponse signinResponse = new SignInResponse();
+        //user details object
+        UserDetailsResponse userDetails = new UserDetailsResponse(user.getId(),
+                user.getNames(),
+                user.getEmail(),
+                user.getRole()
+        );
 
-        signupResponse.setUserDetails(user);
-        signupResponse.setToken(jwt);
-        signupResponse.setRefreshToken(refreshToken);
+        //populate the user singIn response with its values
+        signinResponse.setUserDetails(userDetails);
+        signinResponse.setToken(jwt);
+        signinResponse.setRefreshToken(refreshToken);
 
-        return signupResponse;
+        return signinResponse;
     }
 
      public JWTAuthResponse refreshToken(RefeshTokenRequest refeshTokenRequest){
