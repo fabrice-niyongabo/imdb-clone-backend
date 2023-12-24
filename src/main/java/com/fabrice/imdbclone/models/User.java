@@ -1,5 +1,6 @@
 package com.fabrice.imdbclone.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,6 +21,7 @@ public class User implements UserDetails {
     private String names;
     @Column(unique = true)
     private String email;
+    @JsonIgnore //restricting the pwd to be returned
     private String password;
     private Role role;
 

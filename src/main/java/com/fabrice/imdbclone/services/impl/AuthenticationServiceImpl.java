@@ -1,9 +1,6 @@
 package com.fabrice.imdbclone.services.impl;
 
-import com.fabrice.imdbclone.dto.JWTAuthResponse;
-import com.fabrice.imdbclone.dto.RefeshTokenRequest;
-import com.fabrice.imdbclone.dto.SigninRequest;
-import com.fabrice.imdbclone.dto.SignupRequest;
+import com.fabrice.imdbclone.dto.*;
 import com.fabrice.imdbclone.exceptions.BadRequestException;
 import com.fabrice.imdbclone.exceptions.NotFoundException;
 import com.fabrice.imdbclone.models.Role;
@@ -40,19 +37,26 @@ public class AuthenticationServiceImpl implements AuthenticationService {
       return userRepository.save(user);
     }
 
-    public JWTAuthResponse signin(SigninRequest signinRequest){
+    public SignupResponse signin(SigninRequest signinRequest){
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signinRequest.getEmail(),signinRequest.getPassword()));
         var user  = userRepository.findByEmail(signinRequest.getEmail())
                 .orElseThrow(() -> new BadRequestException("Invalid email or password"));
         var jwt  =  jwtService.generateToken(user);
         var refreshToken  =  jwtService.generateRefreshToken(new HashMap<>(),user);
 
-        JWTAuthResponse jwtAuthResponse =  new JWTAuthResponse();
+//        JWTAuthResponse jwtAuthResponse =  new JWTAuthResponse();
+//        jwtAuthResponse.setToken(jwt);
+//        jwtAuthResponse.setRefreshToken(refreshToken);
 
-        jwtAuthResponse.setToken(jwt);
-        jwtAuthResponse.setRefreshToken(refreshToken);
 
-        return jwtAuthResponse;
+        //response with user details
+        SignupResponse signupResponse = new SignupResponse();
+
+        signupResponse.setUserDetails(user);
+        signupResponse.setToken(jwt);
+        signupResponse.setRefreshToken(refreshToken);
+
+        return signupResponse;
     }
 
      public JWTAuthResponse refreshToken(RefeshTokenRequest refeshTokenRequest){
