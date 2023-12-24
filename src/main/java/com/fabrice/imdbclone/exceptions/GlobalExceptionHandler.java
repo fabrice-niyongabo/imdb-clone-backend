@@ -4,6 +4,7 @@ import com.fabrice.imdbclone.dto.ErrorResponse;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -61,7 +62,7 @@ public class GlobalExceptionHandler {
         Matcher matcher = pattern.matcher(exceptionMessage);
 
         if (matcher.find()) {
-           columnValue = matcher.group(1);
+            columnValue = matcher.group(1);
         } else {
             columnValue += "unknown column name";
         }
@@ -74,6 +75,19 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
+
+    // Bad credentials custom exception
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentialsException(BadCredentialsException ex) {
+
+        ErrorResponse errorResponse = new ErrorResponse();
+
+        errorResponse.setMessage("Wrong email or password");
+        errorResponse.setStatusCode(HttpStatus.BAD_REQUEST.value());
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
 
     // global exceptions => reformatting spring boot exception response
     // for all remaining kind of errors which may occur within our app
