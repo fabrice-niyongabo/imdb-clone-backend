@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
 
         // You can customize the error message here
         // errorResponse.setMessage( "Error: Duplicate value detected for a unique column. ");
-git ad
+
         // Extract column value from the exception message using a regular expression
         String exceptionMessage = ex.getMessage();
         Pattern pattern = Pattern.compile("Duplicate entry '(.+)' for key '(.+)'");
