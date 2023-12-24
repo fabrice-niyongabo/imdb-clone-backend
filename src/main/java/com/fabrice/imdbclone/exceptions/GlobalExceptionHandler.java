@@ -50,25 +50,24 @@ public class GlobalExceptionHandler {
 
 
         ErrorResponse errorResponse = new ErrorResponse();
-        String columnName ="";
+        String columnValue ="";
 
         // You can customize the error message here
         // errorResponse.setMessage( "Error: Duplicate value detected for a unique column. ");
-
-        // Extract column name from the exception message using a regular expression
+git ad
+        // Extract column value from the exception message using a regular expression
         String exceptionMessage = ex.getMessage();
         Pattern pattern = Pattern.compile("Duplicate entry '(.+)' for key '(.+)'");
         Matcher matcher = pattern.matcher(exceptionMessage);
 
         if (matcher.find()) {
-           columnName = matcher.group(2);
-
+           columnValue = matcher.group(1);
         } else {
-            columnName += "unknown column name";
+            columnValue += "unknown column name";
         }
 
         //formatted message
-        String message = columnName +" already exists. Try again with different values";
+        String message = columnValue +" already exists. Try again with different values";
 
         errorResponse.setMessage(message);
         errorResponse.setStatusCode(HttpStatus.CONFLICT.value());
