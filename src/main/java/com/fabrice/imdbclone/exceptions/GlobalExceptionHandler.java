@@ -1,11 +1,15 @@
 package com.fabrice.imdbclone.exceptions;
 
 import com.fabrice.imdbclone.dto.ErrorResponse;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -21,7 +25,7 @@ public class GlobalExceptionHandler {
     }
 
     //handling bad request exception
-    @ExceptionHandler
+    @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleBadRequestException(BadRequestException exception){
         ErrorResponse errorResponse = new ErrorResponse();
@@ -31,13 +35,45 @@ public class GlobalExceptionHandler {
     }
 
     //handling unauthorized exception
-    @ExceptionHandler
+    @ExceptionHandler(UnauthorizedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public  ErrorResponse handleUnauthorizedException(UnauthorizedException exception){
         ErrorResponse errorResponse =  new ErrorResponse();
         errorResponse.setMessage(exception.getMessage());
         errorResponse.setStatusCode(HttpStatus.UNAUTHORIZED.value());
         return errorResponse;
+    }
+
+    //unique column exception handler
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleUniqueConstraintViolation(DataIntegrityViolationException ex) {
+
+
+        ErrorResponse errorResponse = new ErrorResponse();
+        String columnName ="";
+
+        // You can customize the error message here
+        // errorResponse.setMessage( "Error: Duplicate value detected for a unique column. ");
+
+        // Extract column name from the exception message using a regular expression
+        String exceptionMessage = ex.getMessage();
+        Pattern pattern = Pattern.compile("Duplicate entry '(.+)' for key '(.+)'");
+        Matcher matcher = pattern.matcher(exceptionMessage);
+
+        if (matcher.find()) {
+           columnName = matcher.group(2);
+
+        } else {
+            columnName += "unknown column name";
+        }
+
+        //formatted message
+        String message = columnName +" already exists. Try again with different values";
+
+        errorResponse.setMessage(message);
+        errorResponse.setStatusCode(HttpStatus.CONFLICT.value());
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
     // global exceptions => reformatting spring boot exception response
