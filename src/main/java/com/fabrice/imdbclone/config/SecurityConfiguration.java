@@ -1,11 +1,16 @@
 package com.fabrice.imdbclone.config;
 
 
+import com.fabrice.imdbclone.dto.ErrorResponse;
+import com.fabrice.imdbclone.exceptions.UnauthorizedException;
 import com.fabrice.imdbclone.models.Role;
 import com.fabrice.imdbclone.services.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -18,6 +23,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+
 
 @Configuration
 @EnableWebSecurity
@@ -42,7 +49,25 @@ public class SecurityConfiguration {
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider()).addFilterBefore(
                         jwtAuthenticationFIlter, UsernamePasswordAuthenticationFilter.class
-                );
+                )
+                //handling errors that my occur due to unauthorized
+                .exceptionHandling(customizer -> customizer
+                        //handling invalid token
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                            response.setContentType("application/json");
+                            String message = "Invalid token";
+                            int statusCode =  HttpStatus.UNAUTHORIZED.value();
+                            response.getWriter().write("{ \"message\": \""+message+"\",\"statusCode\":\""+statusCode+"\"}");
+                        })
+                        //handling access denied scenario  => trying to access private stuffs
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(HttpStatus.FORBIDDEN.value());
+                            response.setContentType("application/json");
+                            String message = "You do not have access to this route.";
+                            int statusCode =  HttpStatus.FORBIDDEN.value();
+                            response.getWriter().write("{ \"message\": \""+message+"\",\"statusCode\":\""+statusCode+"\"}");
+                        }));
         return http.build();
     }
 

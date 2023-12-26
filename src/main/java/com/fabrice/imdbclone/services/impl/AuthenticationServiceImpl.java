@@ -52,7 +52,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         //response with user details
         SignInResponse signinResponse = new SignInResponse();
         //user details object
-        UserDetailsResponse userDetails = new UserDetailsResponse(user.getId(),
+        UserDetailsResponse userDetails = new UserDetailsResponse(
+                user.getId(),
                 user.getNames(),
                 user.getEmail(),
                 user.getRole()

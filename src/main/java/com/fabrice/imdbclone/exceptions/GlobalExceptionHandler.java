@@ -1,13 +1,16 @@
 package com.fabrice.imdbclone.exceptions;
 
 import com.fabrice.imdbclone.dto.ErrorResponse;
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,11 +41,12 @@ public class GlobalExceptionHandler {
     //handling unauthorized exception
     @ExceptionHandler(UnauthorizedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public  ErrorResponse handleUnauthorizedException(UnauthorizedException exception){
-        ErrorResponse errorResponse =  new ErrorResponse();
+    @ResponseBody
+    public ResponseEntity<ErrorResponse> handleUnauthorizedException(UnauthorizedException exception) {
+        ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setMessage(exception.getMessage());
         errorResponse.setStatusCode(HttpStatus.UNAUTHORIZED.value());
-        return errorResponse;
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
 
     //unique column exception handler
@@ -87,7 +91,6 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
-
 
     // global exceptions => reformatting spring boot exception response
     // for all remaining kind of errors which may occur within our app
