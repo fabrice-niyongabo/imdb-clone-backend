@@ -1,16 +1,12 @@
 package com.fabrice.imdbclone.config;
 
 
-import com.fabrice.imdbclone.dto.ErrorResponse;
-import com.fabrice.imdbclone.exceptions.UnauthorizedException;
 import com.fabrice.imdbclone.models.Role;
 import com.fabrice.imdbclone.services.UserService;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;

@@ -38,16 +38,6 @@ public class GlobalExceptionHandler {
         return errorResponse;
     }
 
-    //handling unauthorized exception
-    @ExceptionHandler(UnauthorizedException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ResponseBody
-    public ResponseEntity<ErrorResponse> handleUnauthorizedException(UnauthorizedException exception) {
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setMessage(exception.getMessage());
-        errorResponse.setStatusCode(HttpStatus.UNAUTHORIZED.value());
-        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
-    }
 
     //unique column exception handler
     @ExceptionHandler(DataIntegrityViolationException.class)
