@@ -20,24 +20,21 @@ public class GlobalExceptionHandler {
 
     //handle not found exception
     @ExceptionHandler(NotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND) //response status code
-    public ErrorResponse handleNotFoundException(NotFoundException exception){
+    public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException exception) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setStatusCode(HttpStatus.NOT_FOUND.value());
         errorResponse.setMessage(exception.getMessage());
-        return  errorResponse;
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     //handling bad request exception
     @ExceptionHandler(BadRequestException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleBadRequestException(BadRequestException exception){
+    public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException exception) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setStatusCode(HttpStatus.BAD_REQUEST.value());
         errorResponse.setMessage(exception.getMessage());
-        return errorResponse;
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
-
 
     //unique column exception handler
     @ExceptionHandler(DataIntegrityViolationException.class)
@@ -45,7 +42,7 @@ public class GlobalExceptionHandler {
 
 
         ErrorResponse errorResponse = new ErrorResponse();
-        String columnValue ="";
+        String columnValue = "";
 
         // You can customize the error message here
         // errorResponse.setMessage( "Error: Duplicate value detected for a unique column. ");
@@ -62,7 +59,7 @@ public class GlobalExceptionHandler {
         }
 
         //formatted message
-        String message = columnValue +" already exists. Try again with different values";
+        String message = columnValue + " already exists. Try again with different values";
 
         errorResponse.setMessage(message);
         errorResponse.setStatusCode(HttpStatus.CONFLICT.value());
@@ -85,12 +82,12 @@ public class GlobalExceptionHandler {
     // global exceptions => reformatting spring boot exception response
     // for all remaining kind of errors which may occur within our app
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGlobalExceptions(Exception exception){
-        String message  =  exception.getMessage();
+    public ResponseEntity<ErrorResponse> handleGlobalExceptions(Exception exception) {
+        String message = exception.getMessage();
         Integer statusCode = HttpStatus.BAD_REQUEST.value();
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setMessage(message);
         errorResponse.setStatusCode(statusCode);
-        return new ResponseEntity<>(errorResponse,HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 }
