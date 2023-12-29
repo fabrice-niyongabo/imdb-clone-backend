@@ -9,10 +9,13 @@ import com.fabrice.imdbclone.repositories.UserRepository;
 import com.fabrice.imdbclone.repositories.WatchlistRepository;
 import com.fabrice.imdbclone.utils.CustomMethods;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/watchlist")
@@ -57,5 +60,18 @@ public class WatchlistController {
             throw new BadRequestException("Movie already exists within your watchlist");
         }
 
+    }
+
+    @DeleteMapping("/{movieId}")
+    public Map<String, String> removeMovieFromWatchlist(@PathVariable Long movieId) {
+        CustomMethods customMethods = new CustomMethods();
+        String email = customMethods.returnLoggedInUsername();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("User not found"));
+
+        watchlistRepository.deleteByUserIdAndMovieId(user.getId(), movieId);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Movie " + movieId + " has been removed from your watchlist");
+        return response;
     }
 }
