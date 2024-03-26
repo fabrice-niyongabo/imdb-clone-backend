@@ -35,3 +35,4 @@ build/
 ### production properties
 /src/main/resources/application-prod.properties
 
+.azure
